@@ -771,4 +771,527 @@ class RopaInvierno(Decorator):
         super(RopaInvierno, self).operation()
         print("Añadiendo Rasgos de Invierno")
  ```
+ ## Patrón de diseño Bridge
+
+El patrón Bridge, también conocido como Handle/Body, es una técnica usada en programación para desacoplar una abstracción de su implementación, de manera que ambas puedan ser modificadas independientemente sin necesidad de alterar por ello la otra. Esto es, se desacopla una abstracción de su implementación para que puedan variar independientemente. (Bridge(patrón))
+Bridge es un patrón de diseño utilizado para desacoplar una abstracción de su implementación de manera que las dos puedan ser modificadas por separado sin necesidad de modificar la otra; dicho de otra manera, se desacopla una abstracción de su implementación para que puedan variar independientemente.
+Bridge es muy utilizado cuando dos piezas de software están relacionadas directamente, sin embargo, existe una gran probabilidad de que una de las dos partes cambie y esto puede llevar a la necesidad de modificar la pieza del otro lado. Para solucionar este problema Bridge propone crear una estructura de clases basada en la agregación, en la cual, una clase puente es utilizada para desacoplar la clase que queremos utilizar y el cliente, de tal forma que este último no conozca la clase destino, permitiendo que cualquier parte pueda cambiar sin afectar a la otra.
+
+### Aplicabilidad
+•	Se desea evitar un enlace permanente entre la abstracción y su implementación. Esto puede ser debido a que la implementación debe ser seleccionada o cambiada en tiempo de ejecución.
+
+•	Tanto las abstracciones como sus implementaciones deben ser extensibles por medio de subclases. En este caso, el patrón Bridge permite combinar abstracciones e implementaciones diferentes y extenderlas independientemente.
+
+•	Cambios en la implementación de una abstracción no deben impactar en los clientes, es decir, su código no debe tener que ser recompilado.
+
+•	Se desea compartir una implementación entre múltiples objetos, y este hecho debe ser escondido a los clientes.
+
+### Ventajas
+
+•	Puedes crear clases y aplicaciones independientes de plataforma.
+
+•	El código cliente funciona con abstracciones de alto nivel. No está expuesto a los detalles 
+de la plataforma.
+
+•	Puedes introducir nuevas abstracciones e implementaciones independientes entre sí.
+
+•	Principio de responsabilidad única. Puedes centrarte en la lógica de alto nivel en la abstracción 
+y en detalles de la plataforma en la implementación.
+
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/157297260-7da201a6-6d4a-490e-aa1f-0a4500317c01.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/157297284-ef9e74bf-0760-47dc-ab66-0fa33df1d17f.png)
+
+## Código 
+### BridgePatternDemo.java
+```
+package java;
+
+public class BridgePatternDemo {
+    public static void main(String[] args) {
+       Shape redCircle = new Circle(100,100, 10, new RedCircle());
+       Shape greenCircle = new Circle(100,100, 10, new GreenCircle());
  
+       redCircle.draw();
+       greenCircle.draw();
+    }
+ }
+ ```
+ ### Circle.java
+```
+ package java;
+
+public class Circle extends Shape {
+    private int x, y, radius;
+ 
+    public Circle(int x, int y, int radius, DrawAPI drawAPI) {
+       super(drawAPI);
+       this.x = x;  
+       this.y = y;  
+       this.radius = radius;
+    }
+ 
+    public void draw() {
+       drawAPI.drawCircle(radius,x,y);
+    }
+ }
+ ```
+ ### DrawAPI.java
+```
+package java;
+
+public interface DrawAPI {
+    public void drawCircle(int radius, int x, int y);
+ }
+```
+### GreenCircle.java
+```
+package java;
+
+public class GreenCircle implements DrawAPI {
+   @Override
+   public void drawCircle(int radius, int x, int y) {
+      System.out.println("Drawing Circle[ color: green, radius: " + radius + ", x: " + x + ", " + y + "]");
+   }
+}
+```
+### RedCircle.java
+```
+package java;
+
+public class RedCircle implements DrawAPI {
+    @Override
+    public void drawCircle(int radius, int x, int y) {
+       System.out.println("Drawing Circle[ color: red, radius: " + radius + ", x: " + x + ", " + y + "]");
+    }
+ }
+```
+### Shape.java
+```
+package java;
+
+public abstract class Shape {
+    protected DrawAPI drawAPI;
+    
+    protected Shape(DrawAPI drawAPI){
+       this.drawAPI = drawAPI;
+    }
+    public abstract void draw();	
+ }
+```
+## Patrón de diseño Facade
+
+El facade pattern es la solución perfecta cuando se buscan estrategias adecuadas para simplificar un Software complejo. Al igual que el patrón decorador o el patrón compuesto, pertenece a la categoría de patrones estructurales de los llamados patrones de diseño que han tenido una influencia decisiva en el diseño de software desde su publicación en 1994. (Digital Guide)
+ 
+El patrón Facade, es un tipo de patrón de diseño estructural. Viene motivado por la necesidad de estructurar un entorno de programación y reducir su complejidad con la división en subsistemas, minimizando las comunicaciones y dependencias entre estos. 
+
+El patrón Facade tiene la característica de ocultar la complejidad de interactuar con un conjunto de subsistemas proporcionando una interface de alto nivel, la cual se encarga de realizar la comunicación con todos los subsistemas necesarios. La fachada es una buena estrategia cuando requerimos interactuar con varios subsistemas para realizar una operación concreta ya que se necesita tener el conocimiento técnico y funcional para saber qué operaciones de cada subsistema tenemos que ejecutar y en qué orden, lo que puede 
+resultar muy complicado cuando los sistemas empiezan a crecer demasiado. (Fachada)
+
+### Problemas / Soluciones
+
+•	Problema: Un cliente necesita acceder a parte de la funcionalidad de un sistema más complejo.
+* Definir una interfaz que permita acceder solamente a esa funcionalidad.
+
+•	Problema: Existen grupos de tareas muy frecuentes para las que se puede crear código más sencillo y legible.
+* Definir funcionalidad que agrupe estas tareas en funciones o métodos sencillos y claros.
+
+•	Problema: Una biblioteca es difícilmente legible.
+* Crear un intermediario más legible.
+
+•	Problema: Dependencia entre el código del cliente y la parte interna de una biblioteca.
+* Crear un intermediario y realizar llamadas a la biblioteca sólo o, sobre todo, a través de él.
+
+•	Problema: Necesidad de acceder a un conjunto de APIs que pueden además tener un diseño no muy bueno.
+* Crear una API intermedia, bien diseñada, que permita acceder a la funcionalidad de las demás.
+.
+### Ventajas
+
+•	Puedes aislar tu código de la complejidad de un subsistema
+
+•	Los cambios se deben realizar en la interfaz/fachada
+
+•	Los clientes permanecen ajenos a los cambios
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/157298692-90e06d1e-b70a-41d9-af6c-f66052b3530a.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/157298721-82affff5-e039-45af-ab32-c2adbba7c77f.png)
+
+## Código 
+### Circle.java
+```
+package Java;
+
+public class Circle implements Shape {
+
+    @Override
+    public void draw() {
+       System.out.println("Circle::draw()");
+    }
+ }
+```
+### FacadePatternDemo.java
+```
+package Java;
+public class FacadePatternDemo {
+    public static void main(String[] args) {
+       ShapeMaker shapeMaker = new ShapeMaker();
+ 
+       shapeMaker.drawCircle();
+       shapeMaker.drawRectangle();
+       shapeMaker.drawSquare();		
+    }
+ }
+```
+### Rectangle.java
+```
+package Java;
+
+public class Rectangle implements Shape {
+
+    @Override
+    public void draw() {
+       System.out.println("Rectangle::draw()");
+    }
+ }
+```
+### Shape.java
+```
+package Java;
+
+public interface Shape {
+    void draw();
+ }
+```
+### ShapeMaker.java
+```
+package Java;
+
+public class ShapeMaker {
+    private Shape circle;
+    private Shape rectangle;
+    private Shape square;
+ 
+    public ShapeMaker() {
+       circle = new Circle();
+       rectangle = new Rectangle();
+       square = new Square();
+    }
+ 
+    public void drawCircle(){
+       circle.draw();
+    }
+    public void drawRectangle(){
+       rectangle.draw();
+    }
+    public void drawSquare(){
+       square.draw();
+    }
+ }
+```
+### Square.java
+```
+package Java;
+
+public class Square implements Shape {
+
+    @Override
+    public void draw() {
+       System.out.println("Square::draw()");
+    }
+ }
+```
+## Patrón de diseño Composite
+
+El patrón de diseño Composite nos sirve para construir estructuras complejas partiendo de otras estructuras mucho más simples, dicho de otra manera, podemos crear estructuras compuestas las cuales están conformadas por otras estructuras más pequeñas. El patrón Composite requiere mínimo de tres componentes para poder existir los cuales son Componente, Leaf o Rama y Composite. (Composite, 2014) 
+
+• Component: Generalmente es una interface o clase abstracta la cual tiene las operaciones mínimas que serán utilizadas, este componente deberá ser extendido por los otros dos componentes Leaf y Composite. 
+
+• Leaf: El leaf u hoja representa la parte más simple o pequeña de toda la estructura y este extiende o hereda de Component. 
+
+• Composite: El composite es una estructura conformada por otros Composite y Leaf; los métodos add y remove los cuales nos permiten agregar objetos de tipo Component. Sin embargo, el Componente es por lo general un Interface o Clase abstracta por lo que podremos agregamos objetos de tipo Composite o Leaf. Visto desde el punto de vista del ejemplo de la casa el Composite podría representar un conjunto de ladrillos o la casa completa. 
+
+El patrón de diseño Composite es uno de los 23 patrones de diseño para el desarrollo de software que fueron publicados en 1994 por los llamados “Gang of Four” o la banda de los cuatro. Así como el patrón Facade y el patrón Decorator, se trata de un patrón de diseño que agrupa objetos complejos y clases en estructuras mayores. 
+
+El concepto básico del patrón Composite consiste en representar objetos simples y sus contenedores en una clase abstracta de manera que puedan ser tratados uniformemente. Este tipo de estructura se conoce como jerarquía parte-todo en la que un objeto es siempre, o una parte de un todo, o un todo compuesto por varias partes. (Ionos) 
+
+Composite es un patrón de diseño estructural que te permite componer objetos en estructuras de árbol y trabajar con esas estructuras como si fueran objetos individuales. El uso del patrón Composite sólo tiene sentido cuando el modelo central de tu aplicación puede representarse en forma de árbol. El patrón Composite sugiere que trabajes con Productos y Cajas a través de una interfaz común que declara un método para calcular el precio total. La gran ventaja de esta solución es que no tienes que preocuparte por las clases concretas de los objetos que componen el árbol. No tienes que saber si un objeto es un producto simple o una sofisticada caja. Puedes tratarlos a todos por igual a través de la interfaz común. Cuando invocas un método, los propios objetos pasan la solicitud a lo largo del árbol. (Refactoring) 
+
+Utiliza el patrón Composite cuando tengas que implementar una estructura de objetos con forma de árbol. Utiliza el patrón cuando quieras que el código cliente trate elementos simples y complejos de la misma forma.
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/157299418-dc172423-c7eb-4ead-8595-f4989e9e440a.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/157299449-6d85c7c8-a125-4dba-8bf1-c35f61e111ee.png)
+
+## Código 
+### Archivo.java
+```
+public class Archivo extends Nodo
+{
+    public Archivo( String nombre )
+    {
+        this.setTipoNodo( Nodo.ARCHIVO );
+        this.setNombre( nombre );
+    }
+    
+    @Override
+     public void mostrar()
+    {
+        System.out.println( "Documento: " + this.getNombre() + "" );
+    }
+}
+```
+### Carpeta.java
+```
+import java.util.ArrayList;
+import java.util.List;
+
+public class Carpeta extends Nodo
+{
+    List<Nodo> nodos = new ArrayList<Nodo>();
+    
+    public Carpeta( String nombre )
+    {
+        this.setTipoNodo( Nodo.CARPETA );
+        this.setNombre( nombre );
+    }
+    
+    public void insertarNodo( Nodo nodo )
+    {
+        nodos.add( nodo );
+    }
+    
+    public void eliminarNodo( Nodo nodo )
+    {
+        nodos.remove( nodo );
+    }
+    
+    public List<Nodo> getNodos()
+    {
+        return nodos;
+    }
+    
+    public Nodo getNodo( int posicion )
+    {
+        return nodos.get( posicion );
+    }
+    
+    @Override
+     public void mostrar()
+    {
+        System.out.println(" ");
+        System.out.println( "Nombre: " + this.getNombre() + "" );
+         for (Nodo nodo : nodos)
+        {
+             nodo.mostrar();
+        }
+    }
+}
+```
+### Main.java
+```
+import java.util.ArrayList;
+import java.util.List;
+
+public class Carpeta extends Nodo
+{
+    List<Nodo> nodos = new ArrayList<Nodo>();
+    
+    public Carpeta( String nombre )
+    {
+        this.setTipoNodo( Nodo.CARPETA );
+        this.setNombre( nombre );
+    }
+    
+    public void insertarNodo( Nodo nodo )
+    {
+        nodos.add( nodo );
+    }
+    
+    public void eliminarNodo( Nodo nodo )
+    {
+        nodos.remove( nodo );
+    }
+    
+    public List<Nodo> getNodos()
+    {
+        return nodos;
+    }
+    
+    public Nodo getNodo( int posicion )
+    {
+        return nodos.get( posicion );
+    }
+    
+    @Override
+     public void mostrar()
+    {
+        System.out.println(" ");
+        System.out.println( "Nombre: " + this.getNombre() + "" );
+         for (Nodo nodo : nodos)
+        {
+             nodo.mostrar();
+        }
+    }
+}
+```
+### Nodo.java
+```
+public abstract class Nodo
+{
+    public static final int ARCHIVO = 1;
+    public static final int CARPETA = 2;
+    protected String nombre = "";
+    protected int tipoNodo;
+    
+    public String getNombre()
+    {
+        return this.nombre;
+    }
+    
+    public void setNombre( String nombre )
+    {
+        this.nombre = nombre;
+    }
+    
+    public int getTipoNodo()
+    {
+        return this.tipoNodo;
+    }
+    
+    public void setTipoNodo( int tipoNodo )
+    {
+        this.tipoNodo = tipoNodo;
+    }
+    
+
+     public abstract void mostrar();
+}
+
+```
+## Patrón de diseño Flyweight
+Flyweight es un patrón que centra su atención en la construcción de objetos ligeros, mediante la abstracción de las partes reutilizables que pueden ser compartidas con otros objetos, esto con el fin de que en lugar de crear objetos cada vez que sea requerido, podamos reutilizar objetos creados por otras instancias logrando con ello reducir en gran 
+medida la capacidad de memoria requerida por la aplicación. Este patrón es utilizado cuando la optimización de los recursos es algo primordial ya que elimina la redundancia 
+de objetos con propiedades idénticas. (Software Architect)
+
+Los componentes que conforman el patrón son:
+
+• Client: Objeto que dispara la ejecución.
+
+• Flyweight Factory: Fábrica que utilizaremos para crear los objetos Flyweight u objetos ligeros.
+
+• Flyweight: Corresponde a los objetos que deseamos reutilizar con el fin de que nuestros objetos sean más ligeros.
+
+El fundamento de este patrón es que los objetos que van a repetirse contengan características comunes. El objetivo es eliminar la redundancia existente mediante la compartición de las características comunes. (Programación.net)
+
+Flyweight es un patrón de diseño estructural que te permite mantener más objetos dentro de la cantidad disponible de RAM compartiendo las partes comunes del estado entre  varios objetos en lugar de mantener toda la información en cada objeto.
+
+El patrón Flyweight sugiere que dejemos de almacenar el estado extrínseco dentro del objeto. En lugar de eso, debes pasar este estado a métodos específicos que dependen de él. Tan solo el estado intrínseco se mantiene dentro del objeto, permitiendo que lo reutilices en distintos contextos. Como resultado, necesitarás menos de estos objetos, ya que sólo se diferencian en el estado intrínseco, que cuenta con muchas menos variaciones que el extrínseco.
+
+Debido a que el mismo objeto flyweight puede utilizarse en distintos contextos, debes asegurarte de que su estado no se pueda modificar. Un objeto flyweight debe inicializar su estado una sola vez a través de parámetros del constructor. No debe exponer ningún método set o campo público a otros objetos.
+
+Existen muchas opciones para colocar este método. El lugar más obvio es un contenedor flyweight. Alternativamente, podrías crea una nueva clase fábrica y hacer estático el método fábrica para colocarlo dentro de una clase flyweight real. El método acepta el estado intrínseco del flyweight deseado por un cliente, busca un objeto flyweight existente que coincida con este estado y lo devuelve si lo encuentra. Si no, crea un nuevo objeto flyweight y lo añade al grupo. (Flyweight)
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/157300492-06e0409a-a9e0-4fe8-a63a-a7f5d65b3da0.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/157300512-36f650d2-b682-40ed-ad44-39273c49c7a7.png)
+
+## Código 
+### Circulo.java
+```
+public class Circulo implements ICirculo
+{
+    private String color;
+    
+    public Circulo( String color )
+    {
+        this.color = color;
+    }
+    
+    @Override
+    public String getColor()
+    {
+        return this.color;
+    }
+    
+    @Override
+     public void dibujar( String fila )
+    {
+        System.out.println( "Dibujando un círculo de color " + this.color + " de tamaño:" + fila + "" );
+    }
+}
+```
+### Creator.java
+```
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Creator
+{
+     private List<ICirculo> circulos;
+    
+    public Creator()
+    {
+         this.circulos = new ArrayList<ICirculo>();
+    }
+    
+     public ICirculo getCircle( String color )
+    {
+        
+         for(ICirculo circulo : this.circulos)
+        {
+             if( circulo.getColor().equals(color) )
+            {
+                System.out.println("Cículo de color " + color + " encontrada, ya existente");
+                return circulo;
+            }
+        }
+        
+        System.out.println("Creando un círculo de color " + color + "");
+         ICirculo circulo = new Circulo( color );
+         this.circulos.add( circulo );
+        return circulo;
+    }
+}
+```
+### ICirculo.java
+```
+public interface ICirculo
+{
+     public String getColor();
+     public void dibujar( String fila );
+}
+```
+### MainCirculo.java
+```
+public class MainCirculo
+{
+    public static void main(String[] args)
+    {
+         Creator Creator = new Creator();
+         System.out.println(" ");
+         ICirculo circulo1 = Creator.getCircle( "Azul" );
+         ICirculo circulo2 = Creator.getCircle( "Rojo" );
+         ICirculo circulo3 = Creator.getCircle( "Verde" );
+         ICirculo circulo4 = Creator.getCircle( "Morado" );
+         ICirculo circulo5 = Creator.getCircle( "Azul" );
+        System.out.println(" ");
+
+        circulo1.dibujar( " Grande" ) ;
+        circulo2.dibujar( " Pequeño" );
+        circulo3.dibujar( " Grande" );
+        circulo4.dibujar( " Mediano" );
+        circulo5.dibujar( " Pequeño" );
+    }
+}
+```
