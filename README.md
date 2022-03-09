@@ -1295,3 +1295,177 @@ public class MainCirculo
     }
 }
 ```
+## Patrón de diseño Iterator
+En diseño de software, el patrón de diseño Iterador, define una interfaz que declara los métodos necesarios para acceder secuencialmente a un grupo de objetos de una colección. Este patrón es tambien conocido como “Cursor”, y su finalidad es proporcionar acceso secuencial a los elementos de un agregado, sin exponer su representación interna. (Iterador (patrón de diseño))
+
+Este patrón se utiliza en relación con objetos que almacenan colecciones de otros objetos, por ejemplo, las listas. El uso de un objeto Iterador permite recorrer los elementos del agregado independientemente de su organización. Si todos los objetos agregados generan un objeto Iterador con el mismo interfaz resulta muy fácil operar con ellos y se facilitan los cambios de implementación. (El Patrón Iterator (Iterador))
+
+Este patrón de diseño permite recorrer una estructura de datos sin que sea necesario conocer la estructura interna de la misma. Es especialmente útil cuando trabajamos con estructuras de datos complejas, ya que nos permite recorrer sus elementos mediante un Iterador, el Iterador es una interface que proporciona los métodos necesarios para recorrer los elementos de la estructura de datos. (Iterator)
+
+El objeto agregado puede crear objetos Iterador para la implementación concreta de dicho agregado. Diferentes implementaciones, diferentes iteradores. A partir de entonces, un objeto cliente puede manipular el agregado únicamente a través del iterador. 
+
+### Aplicabilidad
+•	Utiliza el patrón Iterator cuando tu colección tenga una estructura de datos compleja a nivel interno, pero quieras ocultar su complejidad a los clientes.
+
+•	Utiliza el patrón para reducir la duplicación en el código de recorrido a lo largo de tu aplicación.
+
+•	Utiliza el patrón Iterator cuando quieras que tu código pueda recorrer distintas estructuras de datos, o cuando los tipos de estas estructuras no se conozcan de antemano. (Guru Refactoring)
+
+### Ventajas
+•	Puedes limpiar el código cliente y las colecciones extrayendo algoritmos de recorrido voluminosos y colocándolos en clases independientes.
+
+•	Puedes implementar nuevos tipos de colecciones e iteradores y pasarlos al código existente sin descomponer nada.
+
+•	Puedes recorrer la misma colección en paralelo porque cada objeto iterador contiene su propio estado de iteración.
+
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/157557210-4f2e4eb7-5ecd-4192-91ff-ed56556d55cf.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/157557182-7062ba7b-fadb-4b2d-a133-bec7bce495b5.png)
+
+## Código 
+### Main.java
+```
+public class Main
+{
+    public static void main(String[] args)
+    {
+        try
+        {
+            
+            Anexar agregado = new Anexar();
+            
+            Iterador iterador = agregado.getIterador();
+            
+            String obj = (String) iterador.inicial();
+            System.out.println( "\n" + "Primer color" );
+            System.out.println( obj );
+            
+            iterador.siguiente();
+            iterador.siguiente();
+            
+            System.out.println( "\n" + "Tercer color" );
+            System.out.println( (String) iterador.actual() + "\n" );
+            
+            iterador.inicial();
+            
+            System.out.println( "\n" + "Lista de colores" );
+
+            while( iterador.posterior() == true ) {
+                System.out.println( iterador.siguiente() );
+            }
+        }
+        catch( Exception e )
+        {
+            e.printStackTrace();
+        }
+    }
+}
+```
+### IteradorConcreto.java
+```
+public class IteradorConcreto implements Iterador
+{
+     private Anexar agregado;
+     private int posicion_actual = 0;
+    
+    public IteradorConcreto( Anexar agregado )
+    {
+         this.agregado = agregado;
+    }
+    
+    @Override
+     public Object inicial()
+    {
+        Object obj = null;
+        if( this.agregado.aDatos.isEmpty() == false )
+        {
+            this.posicion_actual = 0;
+            obj = this.agregado.aDatos.firstElement();
+        }
+        return obj;
+    }
+    
+    @Override
+     public Object siguiente()
+    {
+        Object obj = null;
+        if( (this.posicion_actual ) < this.agregado.aDatos.size() )
+        {
+            obj = this.agregado.aDatos.elementAt(this.posicion_actual);
+            this.posicion_actual = this.posicion_actual + 1;
+        }
+        return obj;
+    }
+    
+    @Override
+     public boolean posterior()
+    {
+        boolean ok = false;
+        if( this.posicion_actual < (this.agregado.aDatos.size() ) )
+        {
+            ok = true;
+        }
+        return ok;
+    }
+    
+    @Override
+     public Object actual()
+    {
+        Object obj = null;
+        if( this.posicion_actual < this.agregado.aDatos.size() )
+        {
+            obj = this.agregado.aDatos.elementAt( this.posicion_actual );
+        }
+        return obj;
+    }
+}
+```
+### Iterador.java
+```
+public interface Iterador
+{
+    public Object inicial();
+    public Object siguiente();
+    public boolean posterior();
+    public Object actual();
+}
+```
+### Anexar.java
+```
+import java.util.Vector;
+
+public class Anexar implements Agregado
+{
+     protected Vector aDatos = new Vector();
+    
+    public Anexar() {
+        this.llenar();
+    }
+    
+    @Override
+     public Iterador getIterador()
+    {
+        return new IteradorConcreto( this );
+    }
+    
+    public void llenar()
+    {
+        this.aDatos.add( new String("Rojo") );
+        this.aDatos.add( new String("Azul") );
+        this.aDatos.add( new String("Verde") );
+        this.aDatos.add( new String("Amarillo") );
+        this.aDatos.add( new String("Rosa") );
+        this.aDatos.add( new String("Gris") );
+    }
+}
+```
+### Agregado.java
+```
+public interface Agregado
+{
+    public Iterador getIterador();
+}
+```
