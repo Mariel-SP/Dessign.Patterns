@@ -1759,3 +1759,148 @@ import java.util.ArrayList;
     }
 }
 ```
+## Patrón de diseño Chain of Responsability
+Chain of Responsibility es un patrón de diseño de comportamiento que te permite pasar solicitudes a lo largo de una cadena de manejadores. Al recibir una solicitud, cada manejador decide si la procesa o si la pasa al siguiente manejador de la cadena. El patrón de diseño o cadena de responsabilidad es un patrón de comportamiento que evita acoplar el emisor de una petición a su receptor dando a más de un objeto la posibilidad de responder a una petición. (Cadena de responsabilidad)
+
+Básicamente, este patrón ayuda a encapsular acciones secuenciales sobre un objeto. Por ejemplo, en un sistema de pedidos donde hay que realizar una secuencia de pasos para una determinada acción. Un caso que se me ocurre es el de realizar un proceso de scoring sobre un pedido que puede partirse en distintos pasos. En mi caso suelo identificar la necesidad si tenemos un proceso basado en pasos, que tenemos que ir añadiendo verificaciones y cada vez que aumenta la funcionalidad el código empieza a estar plagado de ifs. Este patrón ayuda a identificar a separar las responsabilidades que realizar en cada paso. (Alonso, 2019)
+
+El Patrón Chain of Responsibility evita el acoplamiento entre el emisor y el receptor de una solicitud, dando a más de un objeto la posibilidad de gestionar la solicitud. Encadena los objetos receptores y pasa la solicitud a lo largo de la cadena hasta que un objeto la atienda. El patrón permite pasar una solicitud a lo largo de una cadena a varios objetos diferentes que tienen la oportunidad de manejar la solicitud. El emisor no necesita saber qué objeto maneja la solicitud, y el objeto manejador no necesita saber quién envió la solicitud, de esta forma no existe acoplamiento entre ambos ya que el cliente y el manejador solo conocen la solicitud. (LARAVEL)
+
+El patrón sugiere que vincules esos manejadores en una cadena. Cada manejador vinculado tiene un campo para almacenar una referencia al siguiente manejador de la cadena. Además de procesar una solicitud, los manejadores la pasan a lo largo de la cadena. La solicitud viaja por la cadena hasta que todos los manejadores han tenido la oportunidad de procesarla.
+
+
+### Aplicabilidad
+•	Utiliza el patrón Chain of Responsibility cuando tu programa deba procesar distintos tipos de solicitudes de varias maneras, pero los tipos exactos de solicitudes y sus secuencias no se conozcan de antemano.
+
+•	Utiliza el patrón cuando sea fundamental ejecutar varios manejadores en un orden específico.
+
+•	 Utiliza el patrón Chain of Responsibility cuando el grupo de manejadores y su orden deban cambiar durante el tiempo de ejecución.
+
+
+### Ventajas
+•	Puedes controlar el orden de control de solicitudes.
+
+•	Principio de responsabilidad única. Puedes desacoplar las clases que invoquen operaciones de las que realicen operaciones.
+
+•	Principio de abierto/cerrado. Puedes introducir nuevos manejadores en la aplicación sin descomponer el código cliente existente.
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/158042558-b0eca650-6fec-4966-ad7e-60b512610c78.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/158042561-b0ba0ce6-0375-44ad-b5a6-fbe48ab48081.png)
+
+## Código 
+### Main.java
+```
+public class Main
+{
+    public static void main(String[] args)
+    {
+        Driver driver1 = new DriverAccept();
+        Driver driver2 = new DriverReject();
+        Driver driver3 = new DriverMissing();
+
+        driver1.setSiguiente( driver2 );
+        driver2.setSiguiente( driver3 );
+        
+        driver1.comprobar("APROBADO");
+        driver1.comprobar("APROBADO");
+        driver1.comprobar("DENEGADO");
+        driver1.comprobar(null);
+        driver1.comprobar("DENEGADO");
+    }
+}
+```
+### Driver.java
+```
+public abstract class Driver
+{
+    protected Driver nextDriver;
+    
+    public Driver getSiguiente() {
+        return this.nextDriver;
+    }
+    
+    public void setSiguiente(Driver driver) {
+        this.nextDriver = driver;
+    }
+    
+     public abstract void comprobar(String status);
+}
+```
+### DriverAccept.java
+```
+public class DriverAccept extends Driver
+{
+    public DriverAccept() {
+    }
+    
+    @Override
+     public void comprobar(String status)
+    {
+       if( (status != null) && (status.equalsIgnoreCase("APROBADO") == true) )
+       {
+           System.out.println("Solicitud aprobada");
+       }
+       else
+       {
+             if( this.getSiguiente() != null )
+            {
+                
+                 this.getSiguiente().comprobar( status );
+            }
+       }
+    }
+}
+```
+### DriverMissing.java
+```
+public class DriverMissing extends Driver
+{
+    public DriverMissing() {
+    }
+    
+    @Override
+     public void comprobar(String status)
+    {
+       if( status == null )
+       {
+           System.out.println("Solicitud pendiente");
+       }
+       else
+       {
+             if( this.getSiguiente() != null )
+            {
+                
+                 this.getSiguiente().comprobar( status );
+            }
+       }
+    }
+}
+```
+### DriverReject.java
+```
+public class DriverReject extends Driver
+{
+    public DriverReject() {
+    }
+    
+    @Override
+     public void comprobar(String status)
+    {
+       if( (status != null) && (status.equalsIgnoreCase("DENEGADO") == true) )
+       {
+           System.out.println("Solicitud denegada");
+       }
+       else
+       {
+             if( this.getSiguiente() != null )
+            {
+                
+                 this.getSiguiente().comprobar( status );
+            }
+       }
+    }
+}
+```
