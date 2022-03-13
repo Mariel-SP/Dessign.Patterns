@@ -1904,3 +1904,170 @@ public class DriverReject extends Driver
     }
 }
 ```
+## Patrón de diseño Mediator
+El patrón mediador define un objeto que encapsula cómo un conjunto de objetos interactúa. Este patrón de diseño está considerado como un patrón de comportamiento debido al hecho de que puede alterar el comportamiento del programa en ejecución. Habitualmente un programa está compuesto de un número de clases. (Mediator (patrón de diseño))
+
+El patrón de diseño Mediator se encarga de gestionar la forma en que un conjunto de clases se comunica entre sí, Mediator es especialmente útil cuando tenemos una gran cantidad de clases que se comunican de forma directa, ya que mediante la implementación de este patrón podemos crear una capa de comunicación bidireccional, en la cual las clases se pueden comunicar con el resto de ellas por medio de un objeto en común que funge como un mediador o intermediario. En proyectos grandes podemos llegar a tener un problema, y es que el número de clases aumenta y con esto también aumentan las relaciones que tienen las clases con el resto de las clases del proyecto. Esto puede suponer un grave problema de acoplamiento con el resto de las clases de nuestro proyecto, sobre todo por que creamos canales de comunicación directos y difíciles de rastrear o depurar. (Mediator)
+
+Un Mediador es un patrón de diseño que coordina las relaciones entre sus asociados. Define un objeto que encapsula cómo interactúan un conjunto de objetos. Promueve un bajo acoplamiento al evitar que los objetos se refieran unos a otros explícitamente, y permite variar la interacción entre ellos de forma independiente. Cuando muchos objetos interactúan con otros objetos, se puede formar una estructura muy compleja, con objetos con muchas conexiones con otros objetos. En un caso extremo cada objeto puede conocer a todos los demás objetos. Para evitar esto el patrón Mediator encapsula el comportamiento de todo un conjunto de objetos en un solo objeto. Los objetos envían y reciben peticiones a través del Mediador, este implementa el comportamiento cooperativo encaminando las peticiones a los objetos deseados. (Amdalucha)
+
+
+
+### Aplicabilidad
+•	Utiliza el patrón Mediator cuando resulte difícil cambiar algunas de las clases porque están fuertemente acopladas a un puñado de otras clases.
+
+•	Utiliza el patrón cuando no puedas reutilizar un componente en un programa diferente porque sea demasiado dependiente de otros componentes.
+
+•	 Utiliza el patrón Mediator cuando te encuentres creando cientos de subclases de componente sólo para reutilizar un comportamiento básico en varios contextos.
+
+
+
+### Ventajas
+•	Principio de responsabilidad única. Puedes extraer las comunicaciones entre varios componentes dentro de un único sitio, haciéndolo más fácil de comprender y mantener.
+
+•	Principio de abierto/cerrado. Puedes introducir nuevos mediadores sin tener que cambiar los propios componentes.
+
+•	Puedes reducir el acoplamiento entre varios componentes de un programa.
+
+•	Puedes reutilizar componentes individuales con mayor facilidad.
+
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/158043923-8144f011-5a09-4775-98ce-e268e013d772.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/158043927-6027660c-baaf-45ac-aaba-806577273124.png)
+
+## Código 
+### Main.java
+```
+public class Main
+{
+    public static void main(String[] args)
+    {
+        // Crear el mediador de la comunicación
+         Mediador a = new Mediador();
+
+        // Crear los objetos participantes
+        Participante p1 = new Avioneta( a );
+        Participante p2 = new Helicoptero( a );
+        Participante p3 = new Avion( a );
+
+        // Agregarlos al objeto mediador
+         a.agregarParticipante( p1 );
+         a.agregarParticipante( p2 );
+         a.agregarParticipante( p3 );
+
+        // Provocar un cambio en un uno de los elementos
+        p2.comunicar("Helicoptero se encuentra en la torre de control");
+    }
+}
+```
+### Mediador.java
+```
+import java.util.ArrayList;
+
+public class Mediador implements IMediador
+{
+    private ArrayList<Participante> participantes;
+    
+    public Mediador()
+    {
+        this.participantes = new ArrayList<Participante>();
+    }
+    
+     public void agregarParticipante(Participante participante)
+    {
+        this.participantes.add( participante );
+    }
+    
+    @Override
+     public void enviar(String mensaje, Participante originator)
+    {
+        for( Participante participante : participantes )
+        {
+            if( participante != originator )
+            {
+                participante.recibir( mensaje );
+            }
+        }
+    }
+}
+```
+### Participante.java
+```
+public abstract class Participante
+{
+    protected IMediador mediador;
+    
+    public IMediador getMediador()
+    {
+        return this.mediador;
+    }
+    
+    public void setMediador( IMediador a )
+    {
+        this.mediador = a;
+    }
+    
+     public void comunicar(String mensaje)
+    {
+        this.getMediador().enviar(mensaje, this);
+    }
+    
+    // Método a implementar por las clases que hereden
+     public abstract void recibir(String mensaje);
+}
+```
+### IMediador.java
+```
+public interface IMediador
+{
+     public void enviar(String mensaje, Participante emisor);
+}
+```
+### Helicoptero.java
+```
+public class Helicoptero extends Participante
+{
+    public Helicoptero(IMediador a) {
+        this.setMediador( a );
+    }
+    
+    @Override
+     public void recibir(String mensaje)
+    {
+        System.out.println( "Helicoptero: " + mensaje );
+    }
+}
+```
+### Avioneta.java
+```
+public class Avioneta extends Participante
+{
+    public Avioneta(IMediador a) {
+        this.setMediador( a );
+    }
+    
+    @Override
+     public void recibir(String mensaje)
+    {
+        System.out.println( "Avioneta: " + mensaje );
+    }
+}
+```
+### Avion.java
+```
+public class Avion extends Participante
+{
+    public Avion(IMediador a) {
+        this.setMediador( a );
+    }
+    
+    @Override
+     public void recibir(String mensaje)
+    {
+        System.out.println( "Avión: " + mensaje );
+    }
+}
+```
