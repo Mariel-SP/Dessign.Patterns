@@ -1551,5 +1551,211 @@ class Originator:
 class Caretaker:
     memento = Memento()
 ```
+## Patrón de diseño Memento
+Memento, es un patrón de diseño cuya finalidad es almacenar el estado de un objeto en un momento dado de manera que se pueda restaurar en ese punto de manera sencilla. (Memento) El patrón Memoria (Memento) se utiliza para guardar y restaurar el estado de un objeto. Este patrón se engloba dentro de los patrones de comportamiento. Este patrón de diseño es útil cuando manejamos un objeto que necesitaremos restaurar a estados anteriores (como por ejemplo cuando utilizamos la función de deshacer en un procesador de textos).
+
+En muchas ocasiones podemos tener la necesidad de guardar el estado de un objeto para poder volver a ese punto en algún momento. Puede ser durante la realización de un proceso largo y complejo, como la realización de algún cálculo científico de fase de algunos videojuegos,  en los que queremos ir guardando el estado conforme vamos realizando cambios para tener un punto de retorno seguro. (CLIBRE.IO)
+
+Memento es un patrón diseñado que nos permite capturar el estado de un objeto en un momento determinado con la finalidad de regresar a este estado en cualquier momento. Este patrón es utilizado cuando tenemos objetos que cambian en el tiempo y por alguna razón necesitamos restaurar su estado en un momento determinado. (SoftwareArch)
+Memento es un patrón de diseño de comportamiento que te permite guardar y restaurar el estado previo de un objeto sin revelar los detalles de su implementación. El patrón Memento delega la creación de instantáneas de estado al propietario de ese estado, el objeto originador. Por lo tanto, en lugar de que haya otros objetos intentando copiar el estado del editor desde el “exterior”, la propia clase editora puede hacer la instantánea, ya que tiene pleno acceso a su propio estado. (Memento Pattern)
+ 
+
+### Aplicabilidad
+•	Utiliza el patrón Memento cuando quieras producir instantáneas del estado del objeto para poder restaurar un estado previo del objeto.
+
+• El patrón Memento te permite realizar copias completas del estado de un objeto, incluyendo campos privados, y almacenarlos independientemente del objeto.
+
+•	Utiliza el patrón cuando el acceso directo a los campos, consultores o modificadores del objeto viole su encapsulación.
+
+•	El Memento hace al propio objeto responsable de la creación de una instantánea de su estado.
+
+### Ventajas
+•	Puedes simplificar el código de la originadora permitiendo que la cuidadora mantenga el historial del estado de la originadora.
+
+•	Puedes producir instantáneas del estado del objeto sin violar su encapsulación.
 
 
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/158040231-72132ad8-08ed-4b78-9803-a8bbeb586f44.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/158040240-a01b9f8e-ec73-43fb-adc3-61b3715f3f70.png)
+
+## Código 
+### Main.py
+```
+import Memento
+
+creador = Memento.Originator("Mariel", "@MarielSalcedo")
+vigilante= Memento.Caretaker()
+vigilante.memento = creador.createMemento()
+print("")
+print("Nombre completo: " + creador.nombre + " " + creador.usuario )
+
+creador.nombre="Andrea"
+creador.usuario="@AndreaHerrera"
+print("Nombre completo: " + creador.nombre + " " + creador.usuario )
+
+creador.nombre="Jonathan"
+creador.usuario="@JonathanGB"
+print("Nombre completo: " + creador.nombre + " " + creador.usuario )
+
+creador.setMemento( vigilante.memento )
+print("")
+print("Nombre completo: " + creador.nombre + " " + creador.usuario )
+print("")
+```
+### Memento.py
+```
+class Memento:
+    nombre = ""
+    usuario = ""
+
+    def __init__(self, nombre = "", usuario = ""):
+        self.nombre = nombre
+        self.usuario = usuario
+
+class Originator:
+    nombre = ""
+    usuario = ""
+
+    def __init__(self, nombre, usuario):
+        self.nombre = nombre
+        self.usuario = usuario
+    
+    def setMemento(self, a):
+        self.nombre = a.nombre
+        self.usuario = a.usuario
+
+    def createMemento(self):
+        return Memento(self.nombre,self.usuario)
+
+class Caretaker:
+    memento = Memento()
+```
+## Patrón de diseño Observer
+El patrón Observador esta englobado dentro de los patrones de comportamiento y permite definir un mecanismo de suscripción uno-muchos por el que los objetos que se suscriben reciben notificaciones cuando se produce un determinado evento. Este patrón viene de la necesidad de tener que realizar acciones basadas en los cambios de otro objeto. Por ejemplo, podemos tener una interface de usuario con diferentes vistas de un valor y queremos que estas vistas se modifiquen de forma automática siempre que lo hace este valor, o lanzar eventos cuando se produzca determinado cambio en un fichero. (CLIBRE) 
+
+El patrón Observer puede ser utilizado cuando hay objetos que dependen de otro, necesitando ser notificados en caso de que se produzca algún cambio en él. Observer es un patrón de diseño de comportamiento que te permite definir un mecanismo de suscripción para notificar a varios objetos sobre cualquier evento que le suceda al objeto que están observando. (Observer)
+
+El patrón Observer sugiere que añadas un mecanismo de suscripción a la clase notificadora para que los objetos individuales puedan suscribirse o cancelar su suscripción a un flujo de eventos que proviene de esa notificadora. Observador es un patrón de diseño de software que define una dependencia del tipo uno a muchos entre objetos, de manera que cuando uno de los objetos cambia su estado, notifica este cambio a todos los dependientes. (Observer (patrón de diseño))
+
+
+### Aplicabilidad
+•	Utiliza el patrón Observer cuando los cambios en el estado de un objeto puedan necesitar cambiar otros objetos y el grupo de objetos sea desconocido de antemano o cambie dinámicamente.
+
+•	El patrón Observer permite que cualquier objeto que implemente la interfaz suscriptora pueda suscribirse a notificaciones de eventos en objetos notificadores.
+
+•	Puedes experimentar este problema a menudo al trabajar con clases de la interfaz gráfica de usuario.
+
+•	Utiliza el patrón cuando algunos objetos de tu aplicación deban observar a otros, pero sólo durante un tiempo limitado o en casos específicos.
+
+
+### Ventajas
+•	Principio de abierto/cerrado. Puedes introducir nuevas clases suscriptoras sin tener que cambiar el código de la notificadora (y viceversa si hay una interfaz notificadora).
+
+•	Puedes establecer relaciones entre objetos durante el tiempo de ejecución.
+
+•	La lista de suscripción es dinámica, por lo que los suscriptores pueden unirse o abandonar la lista cuando lo deseen.
+
+
+
+### Analogía en el mundo real
+![image](https://user-images.githubusercontent.com/81381529/158041232-20063362-738f-4616-a0ea-0fce24fbee92.png)
+
+### Estructura
+![image](https://user-images.githubusercontent.com/81381529/158041237-1a9aeffe-dc1f-4304-80c6-d0ae5aaaeb9a.png)
+
+## Código 
+### Main.java
+```
+public class Main
+{
+    public static void main(String[] args)
+    {
+        
+         UnObservado objObservado = new UnObservado();
+        
+         new UnObservador( objObservado );
+         objObservado.setNumero(55);
+         new UnObservador( objObservado );
+         objObservado.setNumero(50);
+         new UnObservador( objObservado );
+         objObservado.setNumero(57);
+         new UnObservador( objObservado );
+         objObservado.setNumero(59);
+    }
+}
+```
+### UnObservador.java
+```
+public class UnObservador implements IObservador
+{
+    private UnObservado objObservado;
+    
+     public UnObservador( UnObservado objObservado ) {
+        this.objObservado = objObservado;
+         objObservado.AddObserver(this);
+    }
+    
+    @Override
+     public void ObserverActualizado() {
+       System.out.println("El objeto Observado se modifico y ahora es:  " + this.objObservado.getNumero());
+    }
+}
+```
+### IObservador.java
+```
+public interface IObservador
+{
+     public void ObserverActualizado();
+}
+```
+### UnObservado.java
+```
+public class UnObservado extends Observado
+{
+    private int numero = 0;
+    
+    public UnObservado() {
+    }
+    
+    public int getNumero() {
+        return this.numero;
+    }
+    
+    public void setNumero(int numero) {
+        this.numero = numero;
+        
+         NotifyObservers();
+    }
+}
+```
+### Observado.java
+```
+import java.util.ArrayList;
+ 
+ public abstract class Observado
+{
+    private ArrayList<IObservador> observadores = new ArrayList<IObservador>();
+    
+    public Observado() {
+    }
+    
+     public void AddObserver(IObservador o) {
+      observadores.add(o);
+    }
+    
+     public void DeleteObserver(IObservador o) {
+        observadores.remove(o);
+    }
+    
+     public void NotifyObservers()
+    {
+        
+         for (IObservador obj : observadores) {
+             obj.ObserverActualizado();
+        }
+    }
+}
+```
